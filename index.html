@@ -1,0 +1,2025 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق المدرب الذكي - Smart Coach App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/smarteye-tech/Noto-Sans-Arabic-js@main/NotoSansArabic-Regular.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c5e4c; /* Deep forest green */
+            --secondary-color: #4CAF50; /* Vibrant green */
+            --background-color: #f5f7f6; /* Light green tint */
+            --card-background: #ffffff;
+            --text-color: #333;
+            --light-text-color: #666;
+            --border-color: #e0e0e0;
+            --danger-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        [dir="rtl"] {
+            direction: rtl;
+            text-align: right;
+        }
+        [dir="ltr"] {
+            direction: ltr;
+            text-align: left;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px solid var(--secondary-color);
+            position: relative;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        .language-switcher {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+        [dir="rtl"] .language-switcher {
+            left: 20px;
+            right: auto;
+        }
+        [dir="ltr"] .language-switcher {
+            left: auto;
+            right: 20px;
+        }
+
+
+        .language-switcher button {
+            background: none;
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            margin-left: 5px;
+        }
+        [dir="rtl"] .language-switcher button {
+            margin-left: 5px;
+            margin-right: 0;
+        }
+        [dir="ltr"] .language-switcher button {
+            margin-left: 0;
+            margin-right: 5px;
+        }
+
+        .language-switcher button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .language-switcher button.active {
+            background-color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        .page {
+            display: none;
+            padding: 20px 0;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .form-card, .card {
+            background-color: var(--card-background);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 50px auto;
+            box-sizing: border-box;
+        }
+        .card { max-width: none; }
+
+        .form-card h2, .card h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: #fff;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            width: 100%;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            background-color: #45a049; /* Darker green for hover */
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+        }
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .text-center { text-align: center; }
+        .link-text {
+            color: var(--secondary-color);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .player-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .player-list li {
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .player-list li span {
+            font-weight: bold;
+        }
+
+        .player-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            margin-right: 10px;
+            color: var(--secondary-color);
+            transition: color 0.3s ease;
+        }
+        [dir="rtl"] .player-actions button {
+            margin-right: 10px;
+            margin-left: 0;
+        }
+        [dir="ltr"] .player-actions button {
+            margin-right: 0;
+            margin-left: 10px;
+        }
+
+
+        .player-actions button:hover {
+            color: var(--primary-color);
+        }
+
+        .chart-container {
+            width: 100%;
+            margin: 20px auto;
+        }
+        
+        .player-charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .player-chart-card {
+            background: #fdfdfd;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .player-chart-card h4 {
+            text-align: center;
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+
+        .tab-menu {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-menu button {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1.1em;
+            color: var(--light-text-color);
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-menu button.active {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            font-weight: bold;
+        }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .comparison-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .comparison-controls select {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .comparison-controls button {
+            width: auto;
+            padding: 10px 20px;
+            margin: 0;
+        }
+        
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .attendance-table th, .attendance-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: center;
+        }
+        .attendance-table th {
+            background-color: #f2f2f2;
+        }
+        .attendance-table select {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            .form-card, .card { margin: 20px auto; padding: 20px; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .language-switcher { top: 10px; left: 10px; }
+            [dir="rtl"] .language-switcher { left: 10px; right: auto; }
+            [dir="ltr"] .language-switcher { left: auto; right: 10px; }
+            .comparison-controls {
+                flex-direction: column;
+            }
+            .comparison-controls select,
+            .comparison-controls button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 id="headerTitle">تطبيق المدرب الذكي</h1>
+        <p id="headerSubtitle">جميع الحقوق محفوظة 2025</p>
+        <div class="language-switcher">
+            <button id="lang-ar" onclick="setLanguage('ar')" class="active">العربية</button>
+            <button id="lang-en" onclick="setLanguage('en')">English</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="homePage" class="page active">
+            <div class="form-card text-center">
+                <h2 id="platformTitle">منصة شاملة لإدارة الفرق الرياضية</h2>
+                <p id="platformDesc">حلول متكاملة لتحليل الأداء، التخطيط للتدريب، وإنشاء التقارير.</p>
+                <div style="margin-top: 30px;">
+                    <button class="btn" onclick="showPage('loginPage')">
+                        <span id="loginBtn">تسجيل الدخول</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="showPage('registerPage')">
+                        <span id="registerBtn">إنشاء حساب جديد</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="loginPage" class="page">
+            <div class="form-card">
+                <h2 id="loginTitle">تسجيل الدخول</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail" id="emailLabel">البريد الإلكتروني</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword" id="passwordLabel">كلمة المرور</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn">
+                        <span id="loginSubmitBtn">تسجيل الدخول</span>
+                    </button>
+                    <p class="text-center" style="margin-top: 20px;">
+                        <span class="link-text" onclick="showPage('registerPage')" id="noAccountLink">ليس لديك حساب؟ إنشاء حساب</span> | 
+                        <span class="link-text" id="forgotPasswordLink">نسيت كلمة المرور؟</span>
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <div id="registerPage" class="page">
+            <div class="form-card">
+                <h2 id="registerTitle">إنشاء حساب جديد</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="regName" id="nameLabel">الاسم</label>
+                        <input type="text" id="regName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail" id="regEmailLabel">البريد الإلكتروني</label>
+                        <input type="email" id="regEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword" id="regPasswordLabel">كلمة المرور</label>
+                        <input type="password" id="regPassword" required>
+                    </div>
+                    <button type="submit" class="btn">
+                        <span id="createAccountBtn">إنشاء حساب</span>
+                    </button>
+                    <p class="text-center" style="margin-top: 20px;">
+                        <span class="link-text" onclick="showPage('loginPage')" id="haveAccountLink">لدي حساب بالفعل، تسجيل الدخول</span>
+                    </p>
+                </form>
+            </div>
+        </div>
+        
+        <div id="dashboardPage" class="page">
+            <div class="dashboard-grid">
+                <div class="card" onclick="showPage('coachProfilePage')">
+                    <h3 id="coachProfileCard">ملف المدرب</h3>
+                    <p id="coachProfileDesc">تحديث بياناتك الشخصية.</p>
+                </div>
+                <div class="card" onclick="showPage('playerListPage')">
+                    <h3 id="playerManagementCard">إدارة اللاعبين</h3>
+                    <p id="playerManagementDesc">عرض، إضافة، تعديل، وحذف اللاعبين.</p>
+                </div>
+                <div class="card" onclick="showPage('teamAnalysisPage')">
+                    <h3 id="teamAnalysisCard">تحليل الفريق</h3>
+                    <p id="teamAnalysisDesc">رسوم بيانية وتحليل أداء الفريق.</p>
+                </div>
+                <div class="card" onclick="showPage('trainingPlansPage')">
+                    <h3 id="trainingPlansCard">البرامج التدريبية</h3>
+                    <p id="trainingPlansDesc">خطط جاهزة وإنشاء برامج مخصصة.</p>
+                </div>
+                <div class="card" onclick="showPage('trainingSchedulePage')">
+                    <h3 id="trainingScheduleCard">الجدول التدريبي</h3>
+                    <p id="trainingScheduleDesc">إدارة الحصص التدريبية وتسجيل الحضور.</p>
+                </div>
+                <div class="card" onclick="showPage('reportsPage')">
+                    <h3 id="reportsCard">التقارير</h3>
+                    <p id="reportsDesc">توليد وطباعة تقارير PDF.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="coachProfilePage" class="page">
+            <div class="form-card">
+                <h2 id="coachProfileTitle">ملف المدرب</h2>
+                <form id="coachProfileForm">
+                    <div class="form-group">
+                        <label for="coachName" id="coachNameLabel">الاسم</label>
+                        <input type="text" id="coachName">
+                    </div>
+                    <div class="form-group">
+                        <label for="coachTitle" id="coachTitleLabel">اللقب</label>
+                        <input type="text" id="coachTitle">
+                    </div>
+                    <div class="form-group">
+                        <label for="coachAge" id="coachAgeLabel">العمر</label>
+                        <input type="number" id="coachAge">
+                    </div>
+                    <div class="form-group">
+                        <label for="coachNationality" id="coachNationalityLabel">الجنسية</label>
+                        <select id="coachNationality"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="coachLicense" id="coachLicenseLabel">الشهادة التدريبية</label>
+                        <select id="coachLicense">
+                            <option value="">اختر شهادة</option>
+                            <option value="CAF PRO">CAF PRO</option>
+                            <option value="CAF A">CAF A</option>
+                            <option value="CAF B">CAF B</option>
+                            <option value="CAF C">CAF C</option>
+                            <option value="CAF D">CAF D</option>
+                            <option value="AFC PRO">AFC PRO</option>
+                            <option value="AFC A">AFC A</option>
+                            <option value="AFC B">AFC B</option>
+                            <option value="AFC C">AFC C</option>
+                            <option value="AFC D">AFC D</option>
+                            <option value="UEFA PRO">UEFA PRO</option>
+                            <option value="UEFA A">UEFA A</option>
+                            <option value="UEFA B">UEFA B</option>
+                            <option value="UEFA C">UEFA C</option>
+                            <option value="UEFA D">UEFA D</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="GB N1">GB N1</option>
+                            <option value="GB N2">GB N2</option>
+                            <option value="PPH">PPH</option>
+                            <option value="PPH PRO">PPH PRO</option>
+                            <option value="DTS">DTS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="coachAgeGroup" id="coachAgeGroupLabel">الفئات العمرية</label>
+                        <select id="coachAgeGroup">
+                            <option value="">اختر فئة</option>
+                            <option value="U16">أقل من 16 سنة</option>
+                            <option value="U18">أقل من 18 سنة</option>
+                            <option value="U20">أقل من 20 سنة</option>
+                            <option value="Senior">الكبار</option>
+                            <option value="Women">الفريق النسوي</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">
+                        <span id="saveDataBtn">حفظ البيانات</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="showPage('dashboardPage')">
+                        <span id="backToDashboardBtn">العودة للوحة التحكم</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div id="playerListPage" class="page">
+            <div class="card">
+                <div class="tab-menu">
+                    <button id="playerListTabBtn" class="active" onclick="showPlayerTab('playerList')">
+                        <span id="playerListTabTitle">قائمة اللاعبين</span>
+                    </button>
+                    <button id="addPlayerTabBtn" onclick="showPlayerTab('addPlayer')">
+                        <span id="addPlayerTabTitle">إضافة لاعب جديد</span>
+                    </button>
+                    <button id="editPlayerTabBtn" onclick="showPlayerTab('editPlayer')" style="display:none;">
+                        <span id="editPlayerTabTitle">تعديل اللاعب</span>
+                    </button>
+                </div>
+                
+                <div id="playerListTab" class="tab-content active">
+                    <h2 id="playerListTitle">قائمة اللاعبين</h2>
+                    <div id="playerList" class="player-list"></div>
+                </div>
+                
+                <div id="addPlayerTab" class="tab-content">
+                    <h2 id="addPlayerTitle">إضافة لاعب جديد</h2>
+                    <form id="addPlayerForm">
+                        <div class="form-group">
+                            <label for="playerName" id="playerNameLabel">اسم اللاعب</label>
+                            <input type="text" id="playerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="playerAge" id="playerAgeLabel">العمر</label>
+                            <input type="number" id="playerAge" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="playerHeight" id="playerHeightLabel">الطول (سم)</label>
+                            <input type="number" id="playerHeight" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="playerWeight" id="playerWeightLabel">الوزن (كغ)</label>
+                            <input type="number" id="playerWeight" required>
+                        </div>
+                        <h3 id="ratingsTitle">التقييمات</h3>
+                        <p id="ratingsDesc">تقييم من 1 إلى 20</p>
+                        <div id="addPlayerRatings"></div>
+                        <button type="submit" class="btn">
+                            <span id="addPlayerBtn">إضافة اللاعب</span>
+                        </button>
+                    </form>
+                </div>
+                
+                <div id="editPlayerTab" class="tab-content">
+                    <h2 id="editPlayerTitle">تعديل بيانات اللاعب</h2>
+                    <form id="editPlayerForm">
+                        <input type="hidden" id="originalPlayerName">
+                        <div class="form-group">
+                            <label for="editPlayerName" id="editPlayerNameLabel">اسم اللاعب</label>
+                            <input type="text" id="editPlayerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editPlayerAge" id="editPlayerAgeLabel">العمر</label>
+                            <input type="number" id="editPlayerAge" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editPlayerHeight" id="editPlayerHeightLabel">الطول (سم)</label>
+                            <input type="number" id="editPlayerHeight" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editPlayerWeight" id="editPlayerWeightLabel">الوزن (كغ)</label>
+                            <input type="number" id="editPlayerWeight" required>
+                        </div>
+                        <h3 id="editRatingsTitle">التقييمات</h3>
+                        <p id="editRatingsDesc">تقييم من 1 إلى 20</p>
+                        <div id="editPlayerRatings"></div>
+                        <button type="submit" class="btn">
+                            <span id="updatePlayerBtn">تحديث بيانات اللاعب</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <button class="btn btn-secondary" style="width:auto; margin-top:20px;" onclick="showPage('dashboardPage')">
+                <span id="backToDashboard2Btn">العودة للوحة التحكم</span>
+            </button>
+        </div>
+
+        <div id="playerProfilePage" class="page">
+            <div class="card">
+                <div id="playerProfileCardToPrint">
+                    <h2 id="playerProfileTitle">ملف اللاعب</h2>
+                    <h3 id="playerProfileName"></h3>
+                    <div id="playerDetails"></div>
+                    <div class="player-charts-grid">
+                        <div class="player-chart-card">
+                            <h4 id="technicalChartTitle"></h4>
+                            <div class="chart-container">
+                                <canvas id="playerChartTechnical"></canvas>
+                            </div>
+                        </div>
+                        <div class="player-chart-card">
+                            <h4 id="physicalChartTitle"></h4>
+                            <div class="chart-container">
+                                <canvas id="playerChartPhysical"></canvas>
+                            </div>
+                        </div>
+                        <div class="player-chart-card">
+                             <h4 id="tacticalChartTitle"></h4>
+                            <div class="chart-container">
+                                <canvas id="playerChartTactical"></canvas>
+                            </div>
+                        </div>
+                        <div class="player-chart-card">
+                             <h4 id="mentalChartTitle"></h4>
+                            <div class="chart-container">
+                                <canvas id="playerChartMental"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn" onclick="printPDF('player')">
+                    <span id="printPlayerReportBtn">طباعة تقرير اللاعب (PDF)</span>
+                </button>
+                <button class="btn btn-secondary" style="width:auto;" onclick="showPage('playerListPage')">
+                    <span id="backToPlayerListBtn">العودة لقائمة اللاعبين</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="teamAnalysisPage" class="page">
+            <div class="card">
+                <div class="tab-menu">
+                    <button id="teamStatsTabBtn" class="active" onclick="showAnalysisTab('teamStats')">
+                        <span id="teamStatsTabTitle">إحصائيات الفريق</span>
+                    </button>
+                    <button id="playerComparisonTabBtn" onclick="showAnalysisTab('playerComparison')">
+                        <span id="playerComparisonTabTitle">مقارنة اللاعبين</span>
+                    </button>
+                </div>
+                
+                <div id="teamStatsTab" class="tab-content active">
+                    <h2 id="teamAvgRatingsTitle">متوسط تقييمات الفريق</h2>
+                    <div class="chart-container" id="teamChartCard">
+                        <canvas id="teamChart"></canvas>
+                    </div>
+                </div>
+                
+                <div id="playerComparisonTab" class="tab-content">
+                    <h2 id="playerComparisonTitle">مقارنة اللاعبين</h2>
+                    <div class="comparison-controls">
+                        <select id="player1Select"></select>
+                        <select id="player2Select"></select>
+                        <button class="btn" onclick="comparePlayers()">
+                            <span id="compareBtn">مقارنة</span>
+                        </button>
+                    </div>
+                    <div class="chart-container" id="comparisonChartCard">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-secondary" style="width:auto;" onclick="showPage('dashboardPage')">
+                <span id="backToDashboard3Btn">العودة للوحة التحكم</span>
+            </button>
+        </div>
+
+        <div id="trainingSchedulePage" class="page">
+            <div class="card">
+                <h2 id="trainingScheduleTitle">الجدول التدريبي</h2>
+                <form id="addTrainingForm">
+                    <div class="form-group">
+                        <label for="trainingDate" id="trainingDateLabel">التاريخ</label>
+                        <input type="date" id="trainingDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="sessionType" id="sessionTypeLabel">نوع الحصة</label>
+                        <select id="sessionType" required>
+                            <option value="" id="selectSessionTypeOption">اختر نوع الحصة</option>
+                            <option value="technical" id="technicalSessionOption">تدريب تقني</option>
+                            <option value="physical" id="physicalSessionOption">تدريب بدني</option>
+                            <option value="tactical" id="tacticalSessionOption">تدريب تكتيكي</option>
+                            <option value="match" id="matchSessionOption">مباراة</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">
+                        <span id="addSessionBtn">إضافة حصة تدريبية</span>
+                    </button>
+                </form>
+                <hr style="margin: 30px 0;">
+                <h3 id="attendanceTitle">سجل الحضور والغياب</h3>
+                <div class="form-group">
+                    <label for="attendanceDateSelect" id="selectSessionDateLabel">اختر تاريخ الحصة لعرض السجل</label>
+                    <select id="attendanceDateSelect"></select>
+                </div>
+                <div id="attendanceList"></div>
+            </div>
+            <button class="btn btn-secondary" style="width:auto;" onclick="showPage('dashboardPage')">
+                <span id="backToDashboard4Btn">العودة للوحة التحكم</span>
+            </button>
+        </div>
+        
+        <div id="trainingPlansPage" class="page">
+            <div class="card">
+                <div class="tab-menu">
+                    <button id="readyPlansTabBtn" class="active" onclick="showTrainingTab('readyPlans')">
+                        <span id="readyPlansTabTitle">خطط جاهزة</span>
+                    </button>
+                    <button id="autoPlanTabBtn" onclick="showTrainingTab('autoPlan')">
+                        <span id="autoPlanTabTitle">إنشاء خطة تلقائية</span>
+                    </button>
+                </div>
+                
+                <div id="readyPlansTab" class="tab-content active">
+                    <h2 id="readyPlansTitle">خطط تدريبية جاهزة</h2>
+                    <div id="plansList"></div>
+                </div>
+                
+                <div id="autoPlanTab" class="tab-content">
+                    <h2 id="autoPlanTitle">إنشاء خطة تلقائية</h2>
+                    <p id="autoPlanDesc">سيقوم التطبيق باقتراح خطة بناءً على نقاط ضعف فريقك.</p>
+                    <button class="btn" onclick="generateAutoPlan()">
+                        <span id="generatePlanBtn">توليد الخطة</span>
+                    </button>
+                    <div id="autoPlanResult" style="margin-top: 20px; display: none;">
+                        <h3 id="suggestedPlanTitle">الخطة المقترحة</h3>
+                        <p id="suggestedPlanText"></p>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-secondary" style="width:auto;" onclick="showPage('dashboardPage')">
+                <span id="backToDashboard5Btn">العودة للوحة التحكم</span>
+            </button>
+        </div>
+        
+        <div id="reportsPage" class="page">
+            <div class="card">
+                <h2 id="reportsTitle">التقارير والإحصائيات</h2>
+                <button class="btn" onclick="printPDF('team')">
+                    <span id="printTeamReportBtn">طباعة تقرير أداء الفريق (PDF)</span>
+                </button>
+                <button class="btn" style="margin-top: 10px;" onclick="printPDF('attendance')">
+                    <span id="printAttendanceReportBtn">طباعة تقرير الحضور (PDF)</span>
+                </button>
+            </div>
+            <button class="btn btn-secondary" style="width:auto; margin-top: 20px;" onclick="showPage('dashboardPage')">
+                <span id="backToDashboard6Btn">العودة للوحة التحكم</span>
+            </button>
+        </div>
+    </div>
+
+<script>
+    const appState = {
+        currentPage: 'homePage',
+        currentLanguage: 'ar',
+        isAuthenticated: false,
+        players: {
+            "POIM MO": {
+                "details": { "age": 25, "height": 178, "weight": 75 },
+                "ratings": {
+                    "technical": { "passing": 12, "shooting": 18, "dribbling": 15, "ball_control": 17 },
+                    "physical": { "speed": 20, "strength": 6, "endurance": 18, "agility": 20 },
+                    "tactical": { "positioning": 14, "decision_making": 10, "teamwork": 15, "vision": 13 },
+                    "mental": { "concentration": 9, "confidence": 15, "composure": 10, "work_rate": 18 }
+                }
+            },
+            "GUIL OP": {
+                "details": { "age": 22, "height": 185, "weight": 80 },
+                "ratings": {
+                    "technical": { "passing": 6, "shooting": 10, "dribbling": 1, "ball_control": 9 },
+                    "physical": { "speed": 12, "strength": 15, "endurance": 10, "agility": 8 },
+                    "tactical": { "positioning": 7, "decision_making": 5, "teamwork": 10, "vision": 3 },
+                    "mental": { "concentration": 11, "confidence": 7, "composure": 5, "work_rate": 10 }
+                }
+            },
+            "SANT NO": {
+                "details": { "age": 24, "height": 175, "weight": 72 },
+                "ratings": {
+                    "technical": { "passing": 9, "shooting": 5, "dribbling": 7, "ball_control": 10 },
+                    "physical": { "speed": 10, "strength": 12, "endurance": 8, "agility": 11 },
+                    "tactical": { "positioning": 4, "decision_making": 6, "teamwork": 9, "vision": 5 },
+                    "mental": { "concentration": 10, "confidence": 8, "composure": 7, "work_rate": 11 }
+                }
+            },
+            "OFF SID": {
+                "details": { "age": 26, "height": 180, "weight": 78 },
+                "ratings": {
+                    "technical": { "passing": 14, "shooting": 12, "dribbling": 16, "ball_control": 13 },
+                    "physical": { "speed": 15, "strength": 10, "endurance": 14, "agility": 17 },
+                    "tactical": { "positioning": 12, "decision_making": 11, "teamwork": 13, "vision": 10 },
+                    "mental": { "concentration": 13, "confidence": 12, "composure": 11, "work_rate": 14 }
+                }
+            },
+            "JAD MIL": {
+                "details": { "age": 21, "height": 170, "weight": 68 },
+                "ratings": {
+                    "technical": { "passing": 10, "shooting": 11, "dribbling": 8, "ball_control": 10 },
+                    "physical": { "speed": 13, "strength": 10, "endurance": 12, "agility": 15 },
+                    "tactical": { "positioning": 9, "decision_making": 8, "teamwork": 10, "vision": 7 },
+                    "mental": { "concentration": 10, "confidence": 9, "composure": 10, "work_rate": 12 }
+                }
+            },
+            "SADON SIR": {
+                "details": { "age": 23, "height": 179, "weight": 76 },
+                "ratings": {
+                    "technical": { "passing": 11, "shooting": 10, "dribbling": 12, "ball_control": 10 },
+                    "physical": { "speed": 17, "strength": 11, "endurance": 15, "agility": 14 },
+                    "tactical": { "positioning": 10, "decision_making": 9, "teamwork": 10, "vision": 8 },
+                    "mental": { "concentration": 12, "confidence": 11, "composure": 10, "work_rate": 13 }
+                }
+            },
+            "CHFO NOS": {
+                "details": { "age": 20, "height": 172, "weight": 65 },
+                "ratings": {
+                    "technical": { "passing": 8, "shooting": 6, "dribbling": 9, "ball_control": 7 },
+                    "physical": { "speed": 11, "strength": 9, "endurance": 10, "agility": 12 },
+                    "tactical": { "positioning": 6, "decision_making": 5, "teamwork": 7, "vision": 4 },
+                    "mental": { "concentration": 9, "confidence": 7, "composure": 8, "work_rate": 10 }
+                }
+            },
+            "SADO TH": {
+                "details": { "age": 25, "height": 183, "weight": 79 },
+                "ratings": {
+                    "technical": { "passing": 13, "shooting": 15, "dribbling": 14, "ball_control": 12 },
+                    "physical": { "speed": 16, "strength": 10, "endurance": 17, "agility": 18 },
+                    "tactical": { "positioning": 11, "decision_making": 10, "teamwork": 12, "vision": 10 },
+                    "mental": { "concentration": 14, "confidence": 13, "composure": 12, "work_rate": 15 }
+                }
+            },
+            "JGHDR BSS": {
+                "details": { "age": 22, "height": 176, "weight": 71 },
+                "ratings": {
+                    "technical": { "passing": 10, "shooting": 9, "dribbling": 10, "ball_control": 11 },
+                    "physical": { "speed": 14, "strength": 12, "endurance": 13, "agility": 15 },
+                    "tactical": { "positioning": 9, "decision_making": 8, "teamwork": 10, "vision": 7 },
+                    "mental": { "concentration": 11, "confidence": 10, "composure": 10, "work_rate": 12 }
+                }
+            },
+            "KSSF GHI": {
+                "details": { "age": 24, "height": 178, "weight": 73 },
+                "ratings": {
+                    "technical": { "passing": 7, "shooting": 8, "dribbling": 6, "ball_control": 9 },
+                    "physical": { "speed": 12, "strength": 10, "endurance": 11, "agility": 13 },
+                    "tactical": { "positioning": 8, "decision_making": 6, "teamwork": 9, "vision": 5 },
+                    "mental": { "concentration": 10, "confidence": 9, "composure": 8, "work_rate": 10 }
+                }
+            },
+            "SA MO DI": {
+                "details": { "age": 23, "height": 182, "weight": 77 },
+                "ratings": {
+                    "technical": { "passing": 12, "shooting": 10, "dribbling": 11, "ball_control": 10 },
+                    "physical": { "speed": 15, "strength": 13, "endurance": 12, "agility": 16 },
+                    "tactical": { "positioning": 10, "decision_making": 10, "teamwork": 11, "vision": 9 },
+                    "mental": { "concentration": 13, "confidence": 11, "composure": 10, "work_rate": 14 }
+                }
+            },
+            "ATI LOI": {
+                "details": { "age": 21, "height": 174, "weight": 69 },
+                "ratings": {
+                    "technical": { "passing": 10, "shooting": 9, "dribbling": 10, "ball_control": 8 },
+                    "physical": { "speed": 14, "strength": 12, "endurance": 13, "agility": 15 },
+                    "tactical": { "positioning": 9, "decision_making": 8, "teamwork": 10, "vision": 7 },
+                    "mental": { "concentration": 11, "confidence": 10, "composure": 10, "work_rate": 12 }
+                }
+            },
+            "KHTR ABRI": {
+                "details": { "age": 24, "height": 181, "weight": 76 },
+                "ratings": {
+                    "technical": { "passing": 10, "shooting": 11, "dribbling": 10, "ball_control": 12 },
+                    "physical": { "speed": 13, "strength": 11, "endurance": 12, "agility": 14 },
+                    "tactical": { "positioning": 10, "decision_making": 9, "teamwork": 10, "vision": 8 },
+                    "mental": { "concentration": 12, "confidence": 11, "composure": 10, "work_rate": 13 }
+                }
+            },
+            "SAD AMR": {
+                "details": { "age": 20, "height": 170, "weight": 67 },
+                "ratings": {
+                    "technical": { "passing": 9, "shooting": 7, "dribbling": 8, "ball_control": 10 },
+                    "physical": { "speed": 12, "strength": 10, "endurance": 11, "agility": 13 },
+                    "tactical": { "positioning": 8, "decision_making": 7, "teamwork": 9, "vision": 6 },
+                    "mental": { "concentration": 10, "confidence": 9, "composure": 8, "work_rate": 11 }
+                }
+            },
+            "BLTR CHR": {
+                "details": { "age": 23, "height": 184, "weight": 81 },
+                "ratings": {
+                    "technical": { "passing": 11, "shooting": 10, "dribbling": 12, "ball_control": 10 },
+                    "physical": { "speed": 15, "strength": 13, "endurance": 14, "agility": 16 },
+                    "tactical": { "positioning": 10, "decision_making": 10, "teamwork": 11, "vision": 9 },
+                    "mental": { "concentration": 13, "confidence": 12, "composure": 11, "work_rate": 14 }
+                }
+            },
+            "SALH BRABH": {
+                "details": { "age": 26, "height": 182, "weight": 79 },
+                "ratings": {
+                    "technical": { "passing": 12, "shooting": 13, "dribbling": 11, "ball_control": 14 },
+                    "physical": { "speed": 16, "strength": 12, "endurance": 15, "agility": 17 },
+                    "tactical": { "positioning": 11, "decision_making": 10, "teamwork": 12, "vision": 10 },
+                    "mental": { "concentration": 14, "confidence": 13, "composure": 12, "work_rate": 15 }
+                }
+            },
+            "KHLIFI JOS": {
+                "details": { "age": 21, "height": 175, "weight": 70 },
+                "ratings": {
+                    "technical": { "passing": 10, "shooting": 9, "dribbling": 10, "ball_control": 8 },
+                    "physical": { "speed": 13, "strength": 11, "endurance": 12, "agility": 14 },
+                    "tactical": { "positioning": 9, "decision_making": 8, "teamwork": 10, "vision": 7 },
+                    "mental": { "concentration": 11, "confidence": 10, "composure": 10, "work_rate": 12 }
+                }
+            },
+            "KAREC MZ": {
+                "details": { "age": 24, "height": 180, "weight": 78 },
+                "ratings": {
+                    "technical": { "passing": 10, "shooting": 12, "dribbling": 11, "ball_control": 13 },
+                    "physical": { "speed": 15, "strength": 12, "endurance": 14, "agility": 16 },
+                    "tactical": { "positioning": 10, "decision_making": 10, "teamwork": 11, "vision": 9 },
+                    "mental": { "concentration": 13, "confidence": 12, "composure": 11, "work_rate": 14 }
+                }
+            },
+            "YAYA BDMLK": {
+                "details": { "age": 22, "height": 177, "weight": 74 },
+                "ratings": {
+                    "technical": { "passing": 9, "shooting": 10, "dribbling": 8, "ball_control": 10 },
+                    "physical": { "speed": 12, "strength": 10, "endurance": 11, "agility": 13 },
+                    "tactical": { "positioning": 8, "decision_making": 7, "teamwork": 9, "vision": 6 },
+                    "mental": { "concentration": 10, "confidence": 10, "composure": 9, "work_rate": 11 }
+                }
+            },
+            "LRAA BH": {
+                "details": { "age": 25, "height": 183, "weight": 80 },
+                "ratings": {
+                    "technical": { "passing": 11, "shooting": 10, "dribbling": 12, "ball_control": 10 },
+                    "physical": { "speed": 15, "strength": 13, "endurance": 14, "agility": 16 },
+                    "tactical": { "positioning": 10, "decision_making": 10, "teamwork": 11, "vision": 9 },
+                    "mental": { "concentration": 13, "confidence": 12, "composure": 11, "work_rate": 14 }
+                }
+            }
+        },
+        trainingPlans: {
+            "technical": [{ "name": "خطة تحسين التحكم بالكرة", "goal": "التحكم الجيد بالكرة تحت الضغط." }],
+            "physical": [{ "name": "خطة تحسين السرعة", "goal": "زيادة السرعة القصوى والسرعة في تغيير الاتجاه." }],
+            "tactical": [{ "name": "خطة تطوير الدفاع الجماعي", "goal": "الضغط على الخصم وإغلاق المساحات." }],
+            "mental": [{ "name": "خطة بناء الثقة الفردية", "goal": "تعزيز ثقة كل لاعب بنفسه." }]
+        },
+        trainingSessions: {},
+        translations: {
+            ar: {
+                "headerTitle": "تطبيق المدرب الذكي",
+                "headerSubtitle": "جميع الحقوق محفوظة 2025",
+                "platformTitle": "منصة شاملة لإدارة الفرق الرياضية",
+                "platformDesc": "حلول متكاملة لتحليل الأداء، التخطيط للتدريب، وإنشاء التقارير.",
+                "loginBtn": "تسجيل الدخول",
+                "registerBtn": "إنشاء حساب جديد",
+                "loginTitle": "تسجيل الدخول",
+                "emailLabel": "البريد الإلكتروني",
+                "passwordLabel": "كلمة المرور",
+                "loginSubmitBtn": "تسجيل الدخول",
+                "noAccountLink": "ليس لديك حساب؟ إنشاء حساب",
+                "forgotPasswordLink": "نسيت كلمة المرور؟",
+                "registerTitle": "إنشاء حساب جديد",
+                "nameLabel": "الاسم",
+                "regEmailLabel": "البريد الإلكتروني",
+                "regPasswordLabel": "كلمة المرور",
+                "createAccountBtn": "إنشاء حساب",
+                "haveAccountLink": "لدي حساب بالفعل، تسجيل الدخول",
+                "coachProfileCard": "ملف المدرب",
+                "coachProfileDesc": "تحديث بياناتك الشخصية.",
+                "playerManagementCard": "إدارة اللاعبين",
+                "playerManagementDesc": "عرض، إضافة، تعديل، وحذف اللاعبين.",
+                "teamAnalysisCard": "تحليل الفريق",
+                "teamAnalysisDesc": "رسوم بيانية وتحليل أداء الفريق.",
+                "trainingPlansCard": "البرامج التدريبية",
+                "trainingPlansDesc": "خطط جاهزة وإنشاء برامج مخصصة.",
+                "trainingScheduleCard": "الجدول التدريبي",
+                "trainingScheduleDesc": "إدارة الحصص التدريبية وتسجيل الحضور.",
+                "reportsCard": "التقارير",
+                "reportsDesc": "توليد وطباعة تقارير PDF.",
+                "coachProfileTitle": "ملف المدرب",
+                "coachNameLabel": "الاسم",
+                "coachTitleLabel": "اللقب",
+                "coachAgeLabel": "العمر",
+                "coachNationalityLabel": "الجنسية",
+                "coachLicenseLabel": "الشهادة التدريبية",
+                "coachAgeGroupLabel": "الفئات العمرية",
+                "saveDataBtn": "حفظ البيانات",
+                "backToDashboardBtn": "العودة للوحة التحكم",
+                "backToDashboard2Btn": "العودة للوحة التحكم",
+                "backToDashboard3Btn": "العودة للوحة التحكم",
+                "backToDashboard4Btn": "العودة للوحة التحكم",
+                "backToDashboard5Btn": "العودة للوحة التحكم",
+                "backToDashboard6Btn": "العودة للوحة التحكم",
+                "playerListTabTitle": "قائمة اللاعبين",
+                "addPlayerTabTitle": "إضافة لاعب جديد",
+                "editPlayerTabTitle": "تعديل اللاعب",
+                "playerListTitle": "قائمة اللاعبين",
+                "addPlayerTitle": "إضافة لاعب جديد",
+                "editPlayerTitle": "تعديل بيانات اللاعب",
+                "playerNameLabel": "اسم اللاعب",
+                "playerAgeLabel": "العمر",
+                "playerHeightLabel": "الطول (سم)",
+                "playerWeightLabel": "الوزن (كغ)",
+                "editPlayerNameLabel": "اسم اللاعب",
+                "editPlayerAgeLabel": "العمر",
+                "editPlayerHeightLabel": "الطول (سم)",
+                "editPlayerWeightLabel": "الوزن (كغ)",
+                "ratingsTitle": "التقييمات",
+                "ratingsDesc": "تقييم من 1 إلى 20",
+                "editRatingsTitle": "التقييمات",
+                "editRatingsDesc": "تقييم من 1 إلى 20",
+                "addPlayerBtn": "إضافة اللاعب",
+                "updatePlayerBtn": "تحديث بيانات اللاعب",
+                "playerProfileTitle": "ملف اللاعب",
+                "printPlayerReportBtn": "طباعة تقرير اللاعب (PDF)",
+                "backToPlayerListBtn": "العودة لقائمة اللاعبين",
+                "teamStatsTabTitle": "إحصائيات الفريق",
+                "playerComparisonTabTitle": "مقارنة اللاعبين",
+                "teamAvgRatingsTitle": "متوسط تقييمات الفريق",
+                "playerComparisonTitle": "مقارنة اللاعبين",
+                "selectPlayer1Option": "اختر اللاعب الأول",
+                "selectPlayer2Option": "اختر اللاعب الثاني",
+                "compareBtn": "مقارنة",
+                "trainingScheduleTitle": "الجدول التدريبي",
+                "trainingDateLabel": "التاريخ",
+                "sessionTypeLabel": "نوع الحصة",
+                "selectSessionTypeOption": "اختر نوع الحصة",
+                "technicalSessionOption": "تدريب تقني",
+                "physicalSessionOption": "تدريب بدني",
+                "tacticalSessionOption": "تدريب تكتيكي",
+                "matchSessionOption": "مباراة",
+                "addSessionBtn": "إضافة حصة تدريبية",
+                "attendanceTitle": "سجل الحضور والغياب",
+                "selectSessionDateLabel": "اختر تاريخ الحصة لعرض السجل",
+                "readyPlansTabTitle": "خطط جاهزة",
+                "autoPlanTabTitle": "إنشاء خطة تلقائية",
+                "readyPlansTitle": "خطط تدريبية جاهزة",
+                "autoPlanTitle": "إنشاء خطة تلقائية",
+                "autoPlanDesc": "سيقوم التطبيق باقتراح خطة بناءً على نقاط ضعف فريقك.",
+                "generatePlanBtn": "توليد الخطة",
+                "suggestedPlanTitle": "الخطة المقترحة",
+                "reportsTitle": "التقارير والإحصائيات",
+                "printTeamReportBtn": "طباعة تقرير أداء الفريق (PDF)",
+                "printAttendanceReportBtn": "طباعة تقرير الحضور (PDF)",
+                "noPlayers": "لا يوجد لاعبون حاليًا.",
+                "viewAction": "عرض", "editAction": "تعديل", "deleteAction": "حذف",
+                "confirmDelete": "هل أنت متأكد من حذف اللاعب {playerName}؟",
+                "playerDetailAge": "العمر", "playerDetailHeight": "الطول", "playerDetailWeight": "الوزن",
+                "compareError": "يجب اختيار لاعبين للمقارنة.",
+                "noTeamToAnalyze": "لا يوجد لاعبين في الفريق لتحليل الأداء.",
+                "analysisResultPart1": "بناءً على تحليل أداء فريقك، تم تحديد",
+                "analysisResultPart2": "كأضعف جانب.",
+                "analysisResultPart3": "الخطة المقترحة هي:",
+                "analysisResultPart4": "الهدف:",
+                "noSessions": "لا توجد حصص مسجلة",
+                "selectDateForAttendance": "اختر تاريخًا لعرض سجل الحضور.",
+                "attendanceTableName": "اسم اللاعب", "attendanceTableStatus": "الحالة",
+                "statusPresent": "حاضر", "statusAbsent": "غائب", "statusLate": "متأخر",
+                "noAttendanceData": "يرجى اختيار حصة تحتوي على بيانات لطباعة تقرير الحضور.",
+                "selectCountry": "اختر دولة",
+                "accountCreated": "تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.",
+                "coachDataSaved": "تم حفظ بيانات ملف المدرب.",
+                "playerExists": "يوجد لاعب بنفس الاسم بالفعل.",
+                "playerAdded": "تم إضافة اللاعب بنجاح!",
+                "playerExistsNewName": "يوجد لاعب آخر بنفس الاسم الجديد.",
+                "playerUpdated": "تم تحديث بيانات اللاعب بنجاح!",
+                "selectDateError": "الرجاء اختيار تاريخ للحصة.",
+                "sessionExists": "توجد حصة مسجلة في هذا التاريخ بالفعل.",
+                "sessionAdded": "تم إضافة الحصة التدريبية. يمكنك الآن تسجيل الحضور.",
+                "pdfPlayerReportTitle": "تقرير اللاعب: {playerName}",
+                "pdfTeamReportTitle": "تقرير أداء الفريق",
+                "pdfTeamChartLabel": "متوسط الفريق",
+                "pdfAttendanceReportTitle": "تقرير الحضور - {date}",
+                "technicalChartTitle": "الجانب التقني",
+                "physicalChartTitle": "الجانب البدني",
+                "tacticalChartTitle": "الجانب التكتيكي",
+                "mentalChartTitle": "الجانب الذهني",
+            },
+            en: {
+                "headerTitle": "Smart Coach App",
+                "headerSubtitle": "All Rights Reserved 2025",
+                "platformTitle": "A Comprehensive Platform for Sports Team Management",
+                "platformDesc": "Integrated solutions for performance analysis, training planning, and report generation.",
+                "loginBtn": "Login",
+                "registerBtn": "Create a New Account",
+                "loginTitle": "Login",
+                "emailLabel": "Email",
+                "passwordLabel": "Password",
+                "loginSubmitBtn": "Login",
+                "noAccountLink": "Don't have an account? Create one",
+                "forgotPasswordLink": "Forgot Password?",
+                "registerTitle": "Create a New Account",
+                "nameLabel": "Name",
+                "regEmailLabel": "Email",
+                "regPasswordLabel": "Password",
+                "createAccountBtn": "Create Account",
+                "haveAccountLink": "Already have an account? Login",
+                "coachProfileCard": "Coach Profile",
+                "coachProfileDesc": "Update your personal information.",
+                "playerManagementCard": "Player Management",
+                "playerManagementDesc": "View, add, edit, and delete players.",
+                "teamAnalysisCard": "Team Analysis",
+                "teamAnalysisDesc": "Charts and team performance analysis.",
+                "trainingPlansCard": "Training Plans",
+                "trainingPlansDesc": "Ready-made plans and create custom programs.",
+                "trainingScheduleCard": "Training Schedule",
+                "trainingScheduleDesc": "Manage training sessions and attendance.",
+                "reportsCard": "Reports",
+                "reportsDesc": "Generate and print PDF reports.",
+                "coachProfileTitle": "Coach Profile",
+                "coachNameLabel": "Name",
+                "coachTitleLabel": "Title",
+                "coachAgeLabel": "Age",
+                "coachNationalityLabel": "Nationality",
+                "coachLicenseLabel": "Coaching License",
+                "coachAgeGroupLabel": "Age Group",
+                "saveDataBtn": "Save Data",
+                "backToDashboardBtn": "Back to Dashboard",
+                "backToDashboard2Btn": "Back to Dashboard",
+                "backToDashboard3Btn": "Back to Dashboard",
+                "backToDashboard4Btn": "Back to Dashboard",
+                "backToDashboard5Btn": "Back to Dashboard",
+                "backToDashboard6Btn": "Back to Dashboard",
+                "playerListTabTitle": "Player List",
+                "addPlayerTabTitle": "Add New Player",
+                "editPlayerTabTitle": "Edit Player",
+                "playerListTitle": "Player List",
+                "addPlayerTitle": "Add New Player",
+                "editPlayerTitle": "Edit Player Data",
+                "playerNameLabel": "Player Name",
+                "playerAgeLabel": "Age",
+                "playerHeightLabel": "Height (cm)",
+                "playerWeightLabel": "Weight (kg)",
+                "editPlayerNameLabel": "Player Name",
+                "editPlayerAgeLabel": "Age",
+                "editPlayerHeightLabel": "Height (cm)",
+                "editPlayerWeightLabel": "Weight (kg)",
+                "ratingsTitle": "Ratings",
+                "ratingsDesc": "Rate from 1 to 20",
+                "editRatingsTitle": "Ratings",
+                "editRatingsDesc": "Rate from 1 to 20",
+                "addPlayerBtn": "Add Player",
+                "updatePlayerBtn": "Update Player Data",
+                "playerProfileTitle": "Player Profile",
+                "printPlayerReportBtn": "Print Player Report (PDF)",
+                "backToPlayerListBtn": "Back to Player List",
+                "teamStatsTabTitle": "Team Statistics",
+                "playerComparisonTabTitle": "Player Comparison",
+                "teamAvgRatingsTitle": "Team Average Ratings",
+                "playerComparisonTitle": "Player Comparison",
+                "selectPlayer1Option": "Select First Player",
+                "selectPlayer2Option": "Select Second Player",
+                "compareBtn": "Compare",
+                "trainingScheduleTitle": "Training Schedule",
+                "trainingDateLabel": "Date",
+                "sessionTypeLabel": "Session Type",
+                "selectSessionTypeOption": "Select session type",
+                "technicalSessionOption": "Technical Training",
+                "physicalSessionOption": "Physical Training",
+                "tacticalSessionOption": "Tactical Training",
+                "matchSessionOption": "Match",
+                "addSessionBtn": "Add Training Session",
+                "attendanceTitle": "Attendance Log",
+                "selectSessionDateLabel": "Select session date to view log",
+                "readyPlansTabTitle": "Ready-Made Plans",
+                "autoPlanTabTitle": "Generate Auto Plan",
+                "readyPlansTitle": "Ready-Made Training Plans",
+                "autoPlanTitle": "Generate Auto Plan",
+                "autoPlanDesc": "The app will suggest a plan based on your team's weaknesses.",
+                "generatePlanBtn": "Generate Plan",
+                "suggestedPlanTitle": "Suggested Plan",
+                "reportsTitle": "Reports and Statistics",
+                "printTeamReportBtn": "Print Team Performance Report (PDF)",
+                "printAttendanceReportBtn": "Print Attendance Report (PDF)",
+                "noPlayers": "No players currently.",
+                "viewAction": "View", "editAction": "Edit", "deleteAction": "Delete",
+                "confirmDelete": "Are you sure you want to delete player {playerName}?",
+                "playerDetailAge": "Age", "playerDetailHeight": "Height", "playerDetailWeight": "Weight",
+                "compareError": "Please select two players to compare.",
+                "noTeamToAnalyze": "No players in the team to analyze performance.",
+                "analysisResultPart1": "Based on your team performance analysis,",
+                "analysisResultPart2": "has been identified as the weakest aspect.",
+                "analysisResultPart3": "The suggested plan is:",
+                "analysisResultPart4": "Goal:",
+                "noSessions": "No sessions recorded",
+                "selectDateForAttendance": "Select a date to view the attendance log.",
+                "attendanceTableName": "Player Name", "attendanceTableStatus": "Status",
+                "statusPresent": "Present", "statusAbsent": "Absent", "statusLate": "Late",
+                "noAttendanceData": "Please select a session with data to print the attendance report.",
+                "selectCountry": "Select a country",
+                "accountCreated": "Account created successfully! You can now login.",
+                "coachDataSaved": "Coach profile data saved.",
+                "playerExists": "A player with this name already exists.",
+                "playerAdded": "Player added successfully!",
+                "playerExistsNewName": "Another player with the new name already exists.",
+                "playerUpdated": "Player data updated successfully!",
+                "selectDateError": "Please select a date for the session.",
+                "sessionExists": "A session for this date already exists.",
+                "sessionAdded": "Training session added. You can now record attendance.",
+                "pdfPlayerReportTitle": "Player Report: {playerName}",
+                "pdfTeamReportTitle": "Team Performance Report",
+                "pdfTeamChartLabel": "Team Average",
+                "pdfAttendanceReportTitle": "Attendance Report - {date}",
+                "technicalChartTitle": "Technical Aspect",
+                "physicalChartTitle": "Physical Aspect",
+                "tacticalChartTitle": "Tactical Aspect",
+                "mentalChartTitle": "Mental Aspect",
+            }
+        }
+    };
+
+    const charts = {};
+
+    /**
+     * Processes a string to make it compatible with jsPDF for Arabic text rendering.
+     * This includes reshaping the characters for proper connection and reversing for RTL.
+     * @param {string} text The text to process.
+     * @returns {string} The processed text.
+     */
+    function processArabic(text) {
+        if (!text || typeof text !== 'string') {
+            return text;
+        }
+        // Arabic Reshaper functionality
+        const reshape = (function () {
+            const Glyphs = {
+                0x0621: [0xFE80], 0x0622: [0xFE81, 0xFE82], 0x0623: [0xFE83, 0xFE84],
+                0x0624: [0xFE85, 0xFE86], 0x0625: [0xFE87, 0xFE88], 0x0626: [0xFE89, 0xFE8A, 0xFE8B, 0xFE8C],
+                0x0627: [0xFE8D, 0xFE8E], 0x0628: [0xFE8F, 0xFE90, 0xFE91, 0xFE92], 0x0629: [0xFE93, 0xFE94],
+                0x062A: [0xFE95, 0xFE96, 0xFE97, 0xFE98], 0x062B: [0xFE99, 0xFE9A, 0xFE9B, 0xFE9C],
+                0x062C: [0xFE9D, 0xFE9E, 0xFE9F, 0xFEA0], 0x062D: [0xFEA1, 0xFEA2, 0xFEA3, 0xFEA4],
+                0x062E: [0xFEA5, 0xFEA6, 0xFEA7, 0xFEA8], 0x062F: [0xFEA9, 0xFEAA], 0x0630: [0xFEAB, 0xFEAC],
+                0x0631: [0xFEAD, 0xFEAE], 0x0632: [0xFEAF, 0xFEB0], 0x0633: [0xFEB1, 0xFEB2, 0xFEB3, 0xFEB4],
+                0x0634: [0xFEB5, 0xFEB6, 0xFEB7, 0xFEB8], 0x0635: [0xFEB9, 0xFEBA, 0xFEBB, 0xFEBC],
+                0x0636: [0xFEBD, 0xFEBE, 0xFEBF, 0xFEC0], 0x0637: [0xFEC1, 0xFEC2, 0xFEC3, 0xFEC4],
+                0x0638: [0xFEC5, 0xFEC6, 0xFEC7, 0xFEC8], 0x0639: [0xFEC9, 0xFECA, 0xFECB, 0xFECC],
+                0x063A: [0xFECD, 0xFECE, 0xFECF, 0xFED0], 0x0640: [0x0640], 0x0641: [0xFED1, 0xFED2, 0xFED3, 0xFED4],
+                0x0642: [0xFED5, 0xFED6, 0xFED7, 0xFED8], 0x0643: [0xFED9, 0xFEDA, 0xFEDB, 0xFEDC],
+                0x0644: [0xFEDD, 0xFEDE, 0xFEDF, 0xFEE0], 0x0645: [0xFEE1, 0xFEE2, 0xFEE3, 0xFEE4],
+                0x0646: [0xFEE5, 0xFEE6, 0xFEE7, 0xFEE8], 0x0647: [0xFEE9, 0xFEEA, 0xFEEB, 0xFEEC],
+                0x0648: [0xFEED, 0xFEEE], 0x0649: [0xFEEF, 0xFEF0, 0xFEF3, 0xFEF4],
+                0x064A: [0xFEF1, 0xFEF2, 0xFEF3, 0xFEF4], 0x0671: [0xFB50, 0xFB51],
+                0x0679: [0xFB66, 0xFB67, 0xFB68, 0xFB69], 0x067A: [0xFB5E, 0xFB5F, 0xFB60, 0xFB61],
+                0x067B: [0xFB52, 0xFB53, 0xFB54, 0xFB55], 0x067E: [0xFB56, 0xFB57, 0xFB58, 0xFB59],
+                0x067F: [0xFB62, 0xFB63, 0xFB64, 0xFB65], 0x0680: [0xFB5A, 0xFB5B, 0xFB5C, 0xFB5D],
+                0x0683: [0xFB76, 0xFB77, 0xFB78, 0xFB79], 0x0684: [0xFB72, 0xFB73, 0xFB74, 0xFB75],
+                0x0686: [0xFB7A, 0xFB7B, 0xFB7C, 0xFB7D], 0x0687: [0xFB7E, 0xFB7F, 0xFB80, 0xFB81],
+                0x0688: [0xFB88, 0xFB89], 0x068C: [0xFB84, 0xFB85], 0x068D: [0xFB82, 0xFB83],
+                0x068E: [0xFB86, 0xFB87], 0x0691: [0xFB8C, 0xFB8D], 0x0698: [0xFB8A, 0xFB8B],
+                0x0699: [0xFB8E, 0xFB8F], 0x06A4: [0xFB6A, 0xFB6B, 0xFB6C, 0xFB6D],
+                0x06A6: [0xFB6E, 0xFB6F, 0xFB70, 0xFB71], 0x06A9: [0xFB8E, 0xFB8F, 0xFB90, 0xFB91],
+                0x06AD: [0xFBD3, 0xFBD4, 0xFBD5, 0xFBD6], 0x06AF: [0xFB92, 0xFB93, 0xFB94, 0xFB95],
+                0x06B1: [0xFB9A, 0xFB9B, 0xFB9C, 0xFB9D], 0x06B3: [0xFB96, 0xFB97, 0xFB98, 0xFB99],
+                0x06B5: [0xFBA0, 0xFBA1, 0xFBA2, 0xFBA3], 0x06B6: [0xFBA4, 0xFBA5],
+                0x06B7: [0xFBA6, 0xFBA7, 0xFBA8, 0xFBA9], 0x06B8: [0xFBAA, 0xFBAB],
+                0x06BA: [0xFB9E, 0xFB9F], 0x06BB: [0xFBAE, 0xFBAF, 0xFBB0, 0xFBB1],
+                0x06BC: [0xFBE0, 0xFBE1], 0x06BE: [0xFBE4, 0xFBE5, 0xFBE6, 0xFBE7],
+                0x06C0: [0xFBE2, 0xFBE3], 0x06C1: [0xFBE8, 0xFBE9], 0x06C5: [0xFBEA, 0xFBEB],
+                0x06C6: [0xFBEC, 0xFBED], 0x06C7: [0xFBEE, 0xFBEF], 0x06C8: [0xFBF0, 0xFBF1],
+                0x06C9: [0xFBF2, 0xFBF3], 0x06CB: [0xFBF6, 0xFBF7, 0xFBF8],
+                0x06CC: [0xFBFC, 0xFBFD, 0xFBFE, 0xFBFF], 0x06D0: [0xFBE4, 0xFBE5],
+                0x06D2: [0xFBF4, 0xFBF5], 0x06D3: [0xFBF9, 0xFBFA],
+            };
+            const connects_to_prev = [
+                0x0626, 0x0628, 0x062A, 0x062B, 0x062C, 0x062D, 0x062E, 0x0633, 0x0634, 0x0635, 0x0636,
+                0x0637, 0x0638, 0x0639, 0x063A, 0x0640, 0x0641, 0x0642, 0x0643, 0x0644, 0x0645, 0x0646,
+                0x0647, 0x0649, 0x064A, 0x0679, 0x067A, 0x067B, 0x067E, 0x067F, 0x0680, 0x0683, 0x0684,
+                0x0686, 0x0687, 0x06A4, 0x06A6, 0x06A9, 0x06AD, 0x06AF, 0x06B1, 0x06B3, 0x06B5, 0x06B7,
+                0x06BB, 0x06BE, 0x06C1, 0x06CC,
+            ];
+
+            function get_form(letter) {
+                return Glyphs[letter.charCodeAt(0)];
+            }
+
+            function is_arabic_letter(letter) {
+                return letter !== undefined && get_form(letter) !== undefined;
+            }
+
+            function connects_with_prev(letter) {
+                return connects_to_prev.indexOf(letter.charCodeAt(0)) !== -1;
+            }
+
+            return function (text) {
+                text = text.split('').reverse().join('');
+                let result = '';
+                for (let i = 0; i < text.length; i++) {
+                    let letter = text[i];
+                    if (!is_arabic_letter(letter)) {
+                        result += letter;
+                        continue;
+                    }
+                    let form = get_form(letter);
+                    let prev_connects = i > 0 && is_arabic_letter(text[i - 1]) && connects_with_prev(text[i - 1]);
+                    let next_connects = i < text.length - 1 && is_arabic_letter(text[i + 1]) && connects_with_prev(letter);
+
+                    if (form.length === 1) {
+                        result += String.fromCharCode(form[0]);
+                    } else if (form.length === 2) {
+                        result += String.fromCharCode(prev_connects ? form[1] : form[0]);
+                    } else if (form.length === 4) {
+                        if (prev_connects && next_connects) {
+                            result += String.fromCharCode(form[3]);
+                        } else if (prev_connects) {
+                            result += String.fromCharCode(form[2]);
+                        } else if (next_connects) {
+                            result += String.fromCharCode(form[1]);
+                        } else {
+                            result += String.fromCharCode(form[0]);
+                        }
+                    }
+                }
+                return result.split('').reverse().join('');
+            };
+        })();
+        
+        return reshape(text);
+    }
+
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        appState.currentPage = pageId;
+
+        // Re-render or initialize page-specific content
+        if (pageId === 'playerListPage') {
+            renderPlayerList();
+            renderAddPlayerForm();
+        } else if (pageId === 'trainingPlansPage') {
+            renderTrainingPlans();
+        } else if (pageId === 'teamAnalysisPage') {
+            renderTeamAnalysis();
+            populateComparisonSelects();
+        } else if (pageId === 'trainingSchedulePage') {
+            populateAttendanceDateSelect();
+            renderAttendanceList();
+        } else if (pageId === 'coachProfilePage') {
+            populateCountriesDropdown();
+        }
+    }
+
+    function setLanguage(lang) {
+        appState.currentLanguage = lang;
+        document.documentElement.setAttribute('lang', lang);
+        document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+        
+        document.getElementById('lang-ar').classList.toggle('active', lang === 'ar');
+        document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+        
+        const translations = appState.translations[lang];
+        for (const key in translations) {
+            const element = document.getElementById(key);
+            if (element) {
+                element.textContent = translations[key];
+            }
+        }
+        
+        // Re-render dynamic content that depends on language
+        if (appState.isAuthenticated) {
+            showPage(appState.currentPage);
+        }
+    }
+    
+    // --- Player Management ---
+    function renderPlayerList() {
+        const playerListElement = document.getElementById('playerList');
+        playerListElement.innerHTML = '';
+        const translations = appState.translations[appState.currentLanguage];
+
+        if (Object.keys(appState.players).length === 0) {
+            playerListElement.innerHTML = `<p class="text-center">${translations.noPlayers}</p>`;
+            return;
+        }
+
+        const ul = document.createElement('ul');
+        for (const playerName in appState.players) {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span>${playerName}</span>
+                <div class="player-actions">
+                    <button onclick="viewPlayerProfile('${playerName}')" title="${translations.viewAction}"><i class="fas fa-eye"></i></button>
+                    <button onclick="editPlayer('${playerName}')" title="${translations.editAction}"><i class="fas fa-edit"></i></button>
+                    <button onclick="deletePlayer('${playerName}')" title="${translations.deleteAction}"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            `;
+            ul.appendChild(li);
+        }
+        playerListElement.appendChild(ul);
+    }
+
+    function renderPlayerRatingsForm(containerId, playerRatings = null) {
+        const ratingsDiv = document.getElementById(containerId);
+        ratingsDiv.innerHTML = '';
+        const skills = {
+            "technical": ["passing", "shooting", "dribbling", "ball_control"],
+            "physical": ["speed", "strength", "endurance", "agility"],
+            "tactical": ["positioning", "decision_making", "teamwork", "vision"],
+            "mental": ["concentration", "confidence", "composure", "work_rate"]
+        };
+
+        for (const category in skills) {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.innerHTML = `<h4>${getCategoryName(category)}</h4>`;
+            skills[category].forEach(skill => {
+                const value = playerRatings ? playerRatings[category][skill] : '';
+                const skillDiv = document.createElement('div');
+                skillDiv.classList.add('form-group');
+                skillDiv.innerHTML = `
+                    <label for="${containerId}-${skill}">${getSkillName(skill)}</label>
+                    <input type="number" id="${containerId}-${skill}" min="1" max="20" value="${value}" required>
+                `;
+                categoryDiv.appendChild(skillDiv);
+            });
+            ratingsDiv.appendChild(categoryDiv);
+        }
+    }
+
+    function renderAddPlayerForm() {
+        renderPlayerRatingsForm('addPlayerRatings');
+    }
+
+    function showPlayerTab(tabName) {
+        document.querySelectorAll('#playerListPage .tab-content').forEach(tab => tab.classList.remove('active'));
+        document.getElementById(tabName + 'Tab').classList.add('active');
+
+        document.querySelectorAll('#playerListPage .tab-menu button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabName + 'TabBtn').classList.add('active');
+
+        if (tabName === 'addPlayer') {
+            document.getElementById('addPlayerForm').reset();
+        }
+    }
+    
+    function editPlayer(playerName) {
+        const player = appState.players[playerName];
+        if (!player) return;
+
+        document.getElementById('editPlayerTabBtn').style.display = 'inline-block';
+        showPlayerTab('editPlayer');
+
+        document.getElementById('originalPlayerName').value = playerName;
+        document.getElementById('editPlayerName').value = playerName;
+        document.getElementById('editPlayerAge').value = player.details.age;
+        document.getElementById('editPlayerHeight').value = player.details.height;
+        document.getElementById('editPlayerWeight').value = player.details.weight;
+        
+        renderPlayerRatingsForm('editPlayerRatings', player.ratings);
+    }
+
+    function deletePlayer(playerName) {
+        const translations = appState.translations[appState.currentLanguage];
+        const confirmText = translations.confirmDelete.replace('{playerName}', playerName);
+        
+        if (confirm(confirmText)) {
+            delete appState.players[playerName];
+            renderPlayerList();
+            populateComparisonSelects();
+        }
+    }
+    
+    function viewPlayerProfile(playerName) {
+        const player = appState.players[playerName];
+        const translations = appState.translations[appState.currentLanguage];
+        document.getElementById('playerProfileName').textContent = playerName;
+        
+        const detailsDiv = document.getElementById('playerDetails');
+        detailsDiv.innerHTML = `
+            <p><strong>${translations.playerDetailAge}:</strong> ${player.details.age}</p>
+            <p><strong>${translations.playerDetailHeight}:</strong> ${player.details.height} cm</p>
+            <p><strong>${translations.playerDetailWeight}:</strong> ${player.details.weight} kg</p>
+        `;
+
+        const categories = ["technical", "physical", "tactical", "mental"];
+        categories.forEach(category => {
+            const chartId = `playerChart${category.charAt(0).toUpperCase() + category.slice(1)}`;
+            const ctx = document.getElementById(chartId).getContext('2d');
+            
+            const skills = Object.keys(player.ratings[category]).map(skill => getSkillName(skill));
+            const values = Object.values(player.ratings[category]);
+
+            if (charts[chartId]) charts[chartId].destroy();
+            
+            charts[chartId] = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: skills,
+                    datasets: [{
+                        label: playerName,
+                        data: values,
+                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                        borderColor: 'rgba(76, 175, 80, 1)',
+                        pointBackgroundColor: 'rgba(76, 175, 80, 1)'
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: true,
+                    scales: { r: { beginAtZero: true, max: 20, pointLabels: { font: { size: 10 } } } },
+                    animation: { duration: 0 },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        });
+
+        showPage('playerProfilePage');
+    }
+
+    // --- Team Analysis ---
+    function renderTeamAnalysis() {
+        const teamAvg = { technical: 0, physical: 0, tactical: 0, mental: 0 };
+        const playerCount = Object.keys(appState.players).length;
+        if (playerCount === 0) return;
+
+        for (const playerName in appState.players) {
+            const player = appState.players[playerName];
+            for (const category in teamAvg) {
+                const total = Object.values(player.ratings[category]).reduce((sum, val) => sum + val, 0);
+                teamAvg[category] += total / Object.keys(player.ratings[category]).length;
+            }
+        }
+        for (const category in teamAvg) teamAvg[category] /= playerCount;
+
+        const ctx = document.getElementById('teamChart').getContext('2d');
+        const labels = Object.keys(teamAvg).map(key => getCategoryName(key));
+        const data = Object.values(teamAvg);
+        const translations = appState.translations[appState.currentLanguage];
+
+        if (charts.teamChart) charts.teamChart.destroy();
+        
+        charts.teamChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: translations.pdfTeamChartLabel,
+                    data: data,
+                    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                    borderColor: 'rgba(76, 175, 80, 1)',
+                }]
+            },
+            options: { 
+                responsive: true, 
+                scales: { r: { beginAtZero: true, max: 20 } },
+                animation: { duration: 0 }
+            }
+        });
+    }
+
+    function showAnalysisTab(tabName) {
+        document.querySelectorAll('#teamAnalysisPage .tab-content').forEach(tab => tab.classList.remove('active'));
+        document.getElementById(tabName + 'Tab').classList.add('active');
+        document.querySelectorAll('#teamAnalysisPage .tab-menu button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabName + 'TabBtn').classList.add('active');
+    }
+
+    function populateComparisonSelects() {
+        const player1Select = document.getElementById('player1Select');
+        const player2Select = document.getElementById('player2Select');
+        const translations = appState.translations[appState.currentLanguage];
+        
+        player1Select.innerHTML = `<option value="">${translations.selectPlayer1Option}</option>`;
+        player2Select.innerHTML = `<option value="">${translations.selectPlayer2Option}</option>`;
+        
+        for (const playerName in appState.players) {
+            player1Select.innerHTML += `<option value="${playerName}">${playerName}</option>`;
+            player2Select.innerHTML += `<option value="${playerName}">${playerName}</option>`;
+        }
+    }
+
+    function comparePlayers() {
+        const player1Name = document.getElementById('player1Select').value;
+        const player2Name = document.getElementById('player2Select').value;
+        const translations = appState.translations[appState.currentLanguage];
+
+        if (!player1Name || !player2Name) {
+            alert(translations.compareError);
+            return;
+        }
+
+        const player1 = appState.players[player1Name];
+        const player2 = appState.players[player2Name];
+        const allSkills = [], player1Data = [], player2Data = [];
+        
+        for (const category in player1.ratings) {
+            for (const skill in player1.ratings[category]) {
+                allSkills.push(getSkillName(skill));
+                player1Data.push(player1.ratings[category][skill]);
+                player2Data.push(player2.ratings[category][skill]);
+            }
+        }
+
+        const ctx = document.getElementById('comparisonChart').getContext('2d');
+        if (charts.comparisonChart) charts.comparisonChart.destroy();
+        
+        charts.comparisonChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: allSkills,
+                datasets: [{
+                    label: player1Name,
+                    data: player1Data,
+                    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                    borderColor: 'rgba(76, 175, 80, 1)',
+                }, {
+                    label: player2Name,
+                    data: player2Data,
+                    backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                    borderColor: 'rgba(231, 76, 60, 1)',
+                }]
+            },
+            options: { 
+                responsive: true, 
+                scales: { r: { beginAtZero: true, max: 20 } },
+                animation: { duration: 0 }
+            }
+        });
+    }
+
+    // --- Training Plans ---
+    function renderTrainingPlans() {
+        const plansListElement = document.getElementById('plansList');
+        plansListElement.innerHTML = '';
+        for (const category in appState.trainingPlans) {
+            const categorySection = document.createElement('div');
+            categorySection.classList.add('card');
+            categorySection.style.marginBottom = '15px';
+            categorySection.innerHTML = `<h3>${getCategoryName(category)}</h3>`;
+            const ul = document.createElement('ul');
+            // Note: Plan names and goals are not translated in this version as they are user-defined data.
+            appState.trainingPlans[category].forEach(plan => {
+                ul.innerHTML += `<li><strong>${plan.name}:</strong> ${plan.goal}</li>`;
+            });
+            categorySection.appendChild(ul);
+            plansListElement.appendChild(categorySection);
+        }
+    }
+
+    function showTrainingTab(tabName) {
+        document.querySelectorAll('#trainingPlansPage .tab-content').forEach(tab => tab.classList.remove('active'));
+        document.getElementById(tabName + 'Tab').classList.add('active');
+        document.querySelectorAll('#trainingPlansPage .tab-menu button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabName + 'TabBtn').classList.add('active');
+    }
+
+    function generateAutoPlan() {
+        const teamAvg = { technical: 0, physical: 0, tactical: 0, mental: 0 };
+        const playerCount = Object.keys(appState.players).length;
+        const translations = appState.translations[appState.currentLanguage];
+
+        if (playerCount === 0) {
+            document.getElementById('suggestedPlanText').textContent = translations.noTeamToAnalyze;
+            document.getElementById('autoPlanResult').style.display = 'block';
+            return;
+        }
+
+        for (const playerName in appState.players) {
+            const player = appState.players[playerName];
+            for (const category in teamAvg) {
+                const total = Object.values(player.ratings[category]).reduce((sum, val) => sum + val, 0);
+                teamAvg[category] += total / Object.keys(player.ratings[category]).length;
+            }
+        }
+        for (const category in teamAvg) teamAvg[category] /= playerCount;
+
+        const weakestAspect = Object.entries(teamAvg).sort(([, a], [, b]) => a - b)[0];
+        const weakestCategoryKey = weakestAspect[0];
+        const suggestedPlan = appState.trainingPlans[weakestCategoryKey][0];
+
+        document.getElementById('suggestedPlanText').innerHTML = `
+            ${translations.analysisResultPart1} 
+            <strong>${getCategoryName(weakestCategoryKey)}</strong> 
+            ${translations.analysisResultPart2}<br><br>
+            ${translations.analysisResultPart3} <strong>${suggestedPlan.name}</strong><br>
+            ${translations.analysisResultPart4} ${suggestedPlan.goal}
+        `;
+        document.getElementById('autoPlanResult').style.display = 'block';
+    }
+
+    // --- Attendance ---
+    function populateAttendanceDateSelect() {
+        const select = document.getElementById('attendanceDateSelect');
+        select.innerHTML = '';
+        const dates = Object.keys(appState.trainingSessions).sort((a, b) => new Date(b) - new Date(a));
+        if (dates.length === 0) {
+            select.innerHTML = `<option>${appState.translations[appState.currentLanguage].noSessions}</option>`;
+        } else {
+            dates.forEach(date => {
+                select.innerHTML += `<option value="${date}">${date}</option>`;
+            });
+        }
+    }
+
+    function renderAttendanceList() {
+        const date = document.getElementById('attendanceDateSelect').value;
+        const listDiv = document.getElementById('attendanceList');
+        const session = appState.trainingSessions[date];
+        const translations = appState.translations[appState.currentLanguage];
+
+        if (!session) {
+            listDiv.innerHTML = `<p>${translations.selectDateForAttendance}</p>`;
+            return;
+        }
+
+        let tableHTML = `
+            <table class="attendance-table" id="attendance-table-${date}">
+                <thead>
+                    <tr>
+                        <th>${translations.attendanceTableName}</th>
+                        <th>${translations.attendanceTableStatus}</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        Object.keys(appState.players).forEach(playerName => {
+            const status = session.attendance[playerName] || 'present';
+            tableHTML += `
+                <tr>
+                    <td>${playerName}</td>
+                    <td>
+                        <select data-player-name="${playerName}" data-session-date="${date}" onchange="updateAttendance(this)">
+                            <option value="present" ${status === 'present' ? 'selected' : ''}>${translations.statusPresent}</option>
+                            <option value="absent" ${status === 'absent' ? 'selected' : ''}>${translations.statusAbsent}</option>
+                            <option value="late" ${status === 'late' ? 'selected' : ''}>${translations.statusLate}</option>
+                        </select>
+                    </td>
+                </tr>
+            `;
+        });
+
+        tableHTML += `</tbody></table>`;
+        listDiv.innerHTML = tableHTML;
+    }
+
+    function updateAttendance(selectElement) {
+        const playerName = selectElement.dataset.playerName;
+        const sessionDate = selectElement.dataset.sessionDate;
+        const status = selectElement.value;
+        appState.trainingSessions[sessionDate].attendance[playerName] = status;
+    }
+
+    // --- PDF Printing ---
+    async function printPDF(reportType) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFont('NotoSansArabic');
+        const translations = appState.translations[appState.currentLanguage];
+        const isArabic = appState.currentLanguage === 'ar';
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const margin = 20;
+
+        // Helper to process and align text
+        const addArabicText = (text, x, y, options = {}) => {
+            const processedText = isArabic ? processArabic(text) : text;
+            const textOptions = isArabic ? { ...options, align: 'right' } : options;
+            const xPos = isArabic ? pageWidth - x : x;
+            doc.text(processedText, xPos, y, textOptions);
+        };
+
+        if (reportType === 'player') {
+            const playerName = document.getElementById('playerProfileName').textContent;
+            const player = appState.players[playerName];
+            if (!player) return;
+
+            const reportTitle = translations.pdfPlayerReportTitle.replace('{playerName}', playerName);
+            doc.setFontSize(20);
+            addArabicText(reportTitle, pageWidth / 2, 20, { align: 'center' });
+
+
+            doc.setFontSize(12);
+            addArabicText(`${translations.playerDetailAge}: ${player.details.age}`, margin, 40);
+            addArabicText(`${translations.playerDetailHeight}: ${player.details.height} cm`, margin, 50);
+            addArabicText(`${translations.playerDetailWeight}: ${player.details.weight} kg`, margin, 60);
+
+            const categories = ["technical", "physical", "tactical", "mental"];
+            let yPos = 70;
+            
+            for (let i = 0; i < categories.length; i++) {
+                const category = categories[i];
+                const chartId = `playerChart${category.charAt(0).toUpperCase() + category.slice(1)}`;
+                const chartInstance = charts[chartId];
+                
+                if (chartInstance) {
+                    const imgData = chartInstance.toBase64Image();
+                    const xPos = (i % 2 === 0) ? 15 : 110;
+                    if (i > 0 && i % 2 === 0) yPos += 95;
+
+                    doc.setFontSize(14);
+                    const catName = getCategoryName(category);
+                    const processedCatName = isArabic ? processArabic(catName) : catName;
+                    doc.text(processedCatName, xPos + 42.5, yPos, {align: 'center'});
+                    doc.addImage(imgData, 'PNG', xPos, yPos + 5, 85, 85);
+                }
+            }
+            
+            doc.save(`${playerName}_report.pdf`);
+
+        } else if (reportType === 'team') {
+            doc.setFontSize(20);
+            addArabicText(translations.pdfTeamReportTitle, pageWidth / 2, 20, { align: 'center' });
+            
+            const chartInstance = charts.teamChart;
+            if (chartInstance) {
+                const imgData = chartInstance.toBase64Image();
+                const aspectRatio = chartInstance.height / chartInstance.width;
+                doc.addImage(imgData, 'PNG', 15, 30, 180, 180 * aspectRatio);
+            }
+
+            doc.save("team_report.pdf");
+
+        } else if (reportType === 'attendance') {
+            const date = document.getElementById('attendanceDateSelect').value;
+            const session = appState.trainingSessions[date];
+            if (!session || Object.keys(session.attendance).length === 0) {
+                alert(translations.noAttendanceData);
+                return;
+            }
+
+            const reportTitle = translations.pdfAttendanceReportTitle.replace('{date}', date);
+            doc.setFontSize(20);
+            addArabicText(reportTitle, pageWidth / 2, 20, { align: 'center' });
+            
+            const head = [[
+                isArabic ? processArabic(translations.attendanceTableStatus) : translations.attendanceTableStatus,
+                isArabic ? processArabic(translations.attendanceTableName) : translations.attendanceTableName
+            ]];
+            
+            const body = Object.entries(session.attendance).map(([name, status]) => {
+                const statusKey = `status${status.charAt(0).toUpperCase() + status.slice(1)}`;
+                const statusText = translations[statusKey] || status;
+                if (isArabic) {
+                    return [processArabic(statusText), processArabic(name)];
+                }
+                return [statusText, name];
+            });
+
+            doc.autoTable({
+                head: head,
+                body: body,
+                startY: 30,
+                theme: 'grid',
+                styles: { 
+                    font: 'NotoSansArabic',
+                    halign: isArabic ? 'right' : 'left'
+                },
+                headStyles: {
+                    fillColor: [44, 94, 76], // Darker green for header
+                    halign: 'center'
+                },
+            });
+
+            doc.save(`attendance_report_${date}.pdf`);
+        }
+    }
+
+    // --- Coach Profile ---
+    function populateCountriesDropdown() {
+        const countries = {
+            ar: ["الجزائر", "مصر", "السعودية", "المغرب", "تونس", "الإمارات", "قطر", "الكويت", "البحرين", "عمان", "الأردن", "لبنان", "سوريا", "العراق", "فلسطين", "ليبيا", "السودان"],
+            en: ["Algeria", "Egypt", "Saudi Arabia", "Morocco", "Tunisia", "UAE", "Qatar", "Kuwait", "Bahrain", "Oman", "Jordan", "Lebanon", "Syria", "Iraq", "Palestine", "Libya", "Sudan"]
+        };
+        const select = document.getElementById('coachNationality');
+        const translations = appState.translations[appState.currentLanguage];
+        select.innerHTML = `<option value="">${translations.selectCountry}</option>`;
+        countries[appState.currentLanguage].forEach(country => {
+            select.innerHTML += `<option value="${country}">${country}</option>`;
+        });
+    }
+
+    // --- Helpers ---
+    function getCategoryName(category) {
+        const names = appState.translations[appState.currentLanguage];
+        const key = `${category}ChartTitle`;
+        return names[key] || category;
+    }
+
+    function getSkillName(skill) {
+        const names = {
+            ar: { "passing": "التمرير", "shooting": "التسديد", "dribbling": "المراوغة", "ball_control": "التحكم بالكرة", "speed": "السرعة", "strength": "القوة", "endurance": "التحمل", "agility": "الرشاقة", "positioning": "التموضع", "decision_making": "اتخاذ القرار", "teamwork": "العمل الجماعي", "vision": "الرؤية", "concentration": "التركيز", "confidence": "الثقة", "composure": "الهدوء", "work_rate": "معدل العمل" },
+            en: { "passing": "Passing", "shooting": "Shooting", "dribbling": "Dribbling", "ball_control": "Ball Control", "speed": "Speed", "strength": "Strength", "endurance": "Endurance", "agility": "Agility", "positioning": "Positioning", "decision_making": "Decision Making", "teamwork": "Teamwork", "vision": "Vision", "concentration": "Concentration", "confidence": "Confidence", "composure": "Composure", "work_rate": "Work Rate" }
+        };
+        return names[appState.currentLanguage][skill] || skill;
+    }
+
+    // --- Event Listeners ---
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        appState.isAuthenticated = true;
+        showPage('dashboardPage');
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert(appState.translations[appState.currentLanguage].accountCreated);
+        showPage('loginPage');
+    });
+    
+    document.getElementById('coachProfileForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert(appState.translations[appState.currentLanguage].coachDataSaved);
+        showPage('dashboardPage');
+    });
+
+    function getRatingsFromForm(formIdPrefix) {
+        const ratings = { technical: {}, physical: {}, tactical: {}, mental: {} };
+        const skills = {
+            "technical": ["passing", "shooting", "dribbling", "ball_control"],
+            "physical": ["speed", "strength", "endurance", "agility"],
+            "tactical": ["positioning", "decision_making", "teamwork", "vision"],
+            "mental": ["concentration", "confidence", "composure", "work_rate"]
+        };
+        for (const category in skills) {
+            skills[category].forEach(skill => {
+                ratings[category][skill] = parseInt(document.getElementById(`${formIdPrefix}-${skill}`).value) || 1;
+            });
+        }
+        return ratings;
+    }
+
+    document.getElementById('addPlayerForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const playerName = document.getElementById('playerName').value;
+        const translations = appState.translations[appState.currentLanguage];
+        if (appState.players[playerName]) {
+            alert(translations.playerExists);
+            return;
+        }
+        
+        appState.players[playerName] = {
+            details: { 
+                age: parseInt(document.getElementById('playerAge').value), 
+                height: parseInt(document.getElementById('playerHeight').value), 
+                weight: parseInt(document.getElementById('playerWeight').value) 
+            },
+            ratings: getRatingsFromForm('addPlayerRatings')
+        };
+        
+        alert(translations.playerAdded);
+        document.getElementById('addPlayerForm').reset();
+        showPlayerTab('playerList');
+        renderPlayerList();
+        populateComparisonSelects();
+    });
+    
+    document.getElementById('editPlayerForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const originalName = document.getElementById('originalPlayerName').value;
+        const newName = document.getElementById('editPlayerName').value;
+        const translations = appState.translations[appState.currentLanguage];
+
+        if (originalName !== newName && appState.players[newName]) {
+             alert(translations.playerExistsNewName);
+            return;
+        }
+
+        const updatedPlayerData = {
+            details: {
+                age: parseInt(document.getElementById('editPlayerAge').value),
+                height: parseInt(document.getElementById('editPlayerHeight').value),
+                weight: parseInt(document.getElementById('editPlayerWeight').value)
+            },
+            ratings: getRatingsFromForm('editPlayerRatings')
+        };
+        
+        delete appState.players[originalName];
+        appState.players[newName] = updatedPlayerData;
+
+        alert(translations.playerUpdated);
+        document.getElementById('editPlayerTabBtn').style.display = 'none';
+        showPlayerTab('playerList');
+        renderPlayerList();
+        populateComparisonSelects();
+    });
+
+
+    document.getElementById('addTrainingForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const date = document.getElementById('trainingDate').value;
+        const translations = appState.translations[appState.currentLanguage];
+        if (!date) {
+            alert(translations.selectDateError);
+            return;
+        }
+        if (appState.trainingSessions[date]) {
+            alert(translations.sessionExists);
+            return;
+        }
+        
+        const initialAttendance = {};
+        Object.keys(appState.players).forEach(name => {
+            initialAttendance[name] = 'present'; // Default to present
+        });
+
+        appState.trainingSessions[date] = {
+            type: document.getElementById('sessionType').value,
+            attendance: initialAttendance
+        };
+        
+        alert(translations.sessionAdded);
+        document.getElementById('addTrainingForm').reset();
+        populateAttendanceDateSelect();
+        document.getElementById('attendanceDateSelect').value = date;
+        renderAttendanceList();
+    });
+
+    document.getElementById('attendanceDateSelect').addEventListener('change', renderAttendanceList);
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setLanguage('ar');
+        showPage('homePage');
+    });
+</script>
+</body>
+</html>
